@@ -1,6 +1,6 @@
 FROM node:18-buster as installer
-COPY . /juice-shop
-WORKDIR /juice-shop
+COPY . /secure-squeeze
+WORKDIR /secure-squeeze
 RUN npm i -g typescript ts-node
 RUN npm install --omit=dev --unsafe-perm
 RUN npm dedupe
@@ -21,9 +21,9 @@ RUN npm run sbom
 
 # workaround for libxmljs startup error
 FROM node:18-buster as libxmljs-builder
-WORKDIR /juice-shop
+WORKDIR /secure-squeeze
 RUN apt-get update && apt-get install -y build-essential python3
-COPY --from=installer /juice-shop/node_modules ./node_modules
+COPY --from=installer /secure-squeeze/node_modules ./node_modules
 RUN rm -rf node_modules/libxmljs2/build && \
   cd node_modules/libxmljs2 && \
   npm run build
@@ -43,9 +43,9 @@ LABEL maintainer="Bjoern Kimminich <bjoern.kimminich@owasp.org>" \
     org.opencontainers.image.source="https://github.com/juice-shop/juice-shop" \
     org.opencontainers.image.revision=$VCS_REF \
     org.opencontainers.image.created=$BUILD_DATE
-WORKDIR /juice-shop
-COPY --from=installer --chown=65532:0 /juice-shop .
-COPY --chown=65532:0 --from=libxmljs-builder /juice-shop/node_modules/libxmljs2 ./node_modules/libxmljs2
+WORKDIR /secure-squeeze
+COPY --from=installer --chown=65532:0 /secure-squeeze .
+COPY --chown=65532:0 --from=libxmljs-builder /secure-squeeze/node_modules/libxmljs2 ./node_modules/libxmljs2
 USER 65532
 EXPOSE 3000
-CMD ["/juice-shop/build/app.js"]
+CMD ["/secure-squeeze/build/app.js"]

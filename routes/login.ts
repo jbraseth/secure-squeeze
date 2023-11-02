@@ -35,7 +35,7 @@ module.exports = function login () {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
 
     // If statement that detects if there is a SQL Injection in the email or password.
-    if (req.body.email.match(/.*['-;].*/) || req.body.password.match(/.*['-;].*/)) {
+    if (req.body.email.match(/.*[-';].*/) || req.body.password.match(/.*[-';].*/)) {
       res.status(451).send(res.__('SQL Injection detected.'))
     }
 

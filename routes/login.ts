@@ -39,7 +39,7 @@ module.exports = function login () {
       res.status(451).send(res.__('SQL Injection detected.'))
     }
 
-    models.sequelize.query(`SELECT * FROM Users WHERE email = $1 AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`,)
+    models.sequelize.query(`SELECT * FROM Users WHERE email = '${req.body.email || ''}' AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`, { model: UserModel, plain: true })
     // { bind: [ req.body.email ], model: models.User, plain: true })
     .then((authenticatedUser: { data: User }) => {
         const user = utils.queryResultToJson(authenticatedUser)

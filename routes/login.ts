@@ -35,12 +35,12 @@ module.exports = function login () {
     verifyPreLoginChallenges(req) // vuln-code-snippet hide-line
 
     // If statement that detects if there is a SQL Injection in the email or password.
-    //if (req.body.email.match(/.*[-';].*/) || req.body.password.match(/.*[-';].*/)) {
-      //res.status(451).send(res.__('SQL Injection detected.'))
-    //}
+    if (req.body.email.match(/.*[-';].*/) || req.body.password.match(/.*[-';].*/)) {
+      res.status(451).send(res.__('SQL Injection detected.'))
+    }
 
-    models.sequelize.query(`SELECT * FROM Users WHERE email = $1 AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`,
-    { bind: [ req.body.email ], model: models.User, plain: true })
+    models.sequelize.query(`SELECT * FROM Users WHERE email = $1 AND password = '${security.hash(req.body.password || '')}' AND deletedAt IS NULL`,)
+    // { bind: [ req.body.email ], model: models.User, plain: true })
     .then((authenticatedUser: { data: User }) => {
         const user = utils.queryResultToJson(authenticatedUser)
         if (user.data?.id && user.data.totpSecret !== '') {
